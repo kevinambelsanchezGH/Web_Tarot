@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dualtarot</title>
+    <meta charset="UTF-8">
+    <title>Cita Tarot</title>
+    <link rel="stylesheet" href="/css/estilo.css">
+</head>
+<body>
+    
+    <div class="nav-links">
+    <a href="sobre-mi.html" class="sobre-mi-link">✨ Sobre mí</a>
+    </div>
+
+    <div class="card">
+        <h2>Sesiones privadas Dualtarot</h2>
+   <form action="/citas/guardar" method="post">
+        <input type="text" name="nombre" placeholder="Nombre" required>
+        <input type="text" name="apellidos" placeholder="Apellidos">
+        <input type="text" name="instagram" placeholder="Usuario de Instagram" required>
+        <input type="text" name="telefono" placeholder="Teléfono móvil (Opcional)">
+        <input type="email" name="email" placeholder="Email (Opcional)">
+        <input type="datetime-local" name="fechaCita" required>
+        <button type="submit">Reservar Cita</button>
+   </form>    
+    </div>
+</body>
+</html>

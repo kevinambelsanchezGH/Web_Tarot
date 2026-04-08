@@ -1,0 +1,108 @@
+:root {
+    --oro: #d4af37;
+    --purpura-oscuro: #1a001a;
+    --ocre-medio: #ffe297;
+    --blanco-suave: #f4f4f4;
+}
+
+body {
+    background: linear-gradient(135deg, var(--purpura-oscuro) 0%, var(--ocre-medio) 100%);
+    color: var(--blanco-suave);
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 2.5rem;
+    border-radius: 20px;
+    border: 1px solid var(--oro);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(212, 175, 55, 0.1);
+    width: 100%;
+    max-width: 450px;
+    backdrop-filter: blur(10px);
+}
+
+h2 {
+    text-align: center;
+    color: var(--oro);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 25px;
+    font-size: 1.8rem;
+}
+
+input {
+    width: 100%;
+    padding: 12px 15px;
+    margin: 8px 0;
+    border-radius: 8px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    background: rgba(0, 0, 0, 0.4);
+    color: white;
+    box-sizing: border-box;
+    transition: 0.3s;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--oro);
+    box-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
+    background: rgba(0, 0, 0, 0.6);
+}
+
+button {
+    width: 100%;
+    background: var(--oro);
+    color: var(--purpura-oscuro);
+    border: none;
+    padding: 15px;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 20px;
+    font-size: 1rem;
+    letter-spacing: 1px;
+}
+
+button:hover {
+    background: #f1c40f;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Para los placeholders en color clarito */
+::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+.nav-links {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+}
+
+.sobre-mi-link {
+    color: var(--oro);
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.1rem;
+    padding: 10px 15px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    transition: 0.3s;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(5px);
+}
+
+.sobre-mi-link:hover {
+    border-color: var(--oro);
+    background: rgba(212, 175, 55, 0.1);
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+    transform: scale(1.05);
+}
