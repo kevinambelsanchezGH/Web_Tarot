@@ -7,6 +7,8 @@ import com.example.demo.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.ui.Model;
+import java.util.List;
 
 import java.time.LocalDateTime;
 
@@ -48,4 +50,14 @@ public class CitaController {
         // 3. Al terminar, mandamos al usuario a una página de éxito
         return "redirect:/exito.html";
     }
+@GetMapping("/admin")
+public String mostrarPanelAdmin(Model model) {
+    // Esto busca a todos los usuarios/citas en la base de datos
+    List<Usuario> listaCitas = usuarioRepository.findAll();
+    
+    // Esto se lo envía al HTML para que lo pinte
+    model.addAttribute("citas", listaCitas);
+    
+    return "admin"; // Esto buscará un archivo llamado admin.html
+}
 }
