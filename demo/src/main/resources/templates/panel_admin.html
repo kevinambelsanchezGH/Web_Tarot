@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <h1>Gestión de Citas</h1>
+
+   <table border="1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Fecha</th>
+            <th>Estado</th>
+            <th>Nombre</th>
+            <th>Apellidos</th>
+            <th>Teléfono</th>
+            <th>Email</th>
+            <th>Instagram</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="cita : ${citas}">
+            <td th:text="${cita.id}"></td>
+            <td th:text="${cita.fechaCita}"></td>
+            <td th:text="${cita.estado}"></td>
+            <td th:text="${cita.usuario != null ? cita.usuario.nombre : 'N/A'}"></td>
+            <td th:text="${cita.usuario != null ? cita.usuario.apellidos : 'N/A'}"></td>
+            <td th:text="${cita.usuario != null ? cita.usuario.telefono : 'N/A'}"></td>
+            <td th:text="${cita.usuario != null ? cita.usuario.email : 'N/A'}"></td>
+            <td th:text="${cita.usuario != null ? cita.usuario.instagram : 'N/A'}"></td>
+        </tr>
+    </tbody>
+</table>
+</body>
+</html>
