@@ -9,8 +9,12 @@ import java.time.LocalDateTime;
 public class Cita {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    
     private Long id;
+
+    @OneToOne //Para la clase disponibilidad
+    @JoinColumn(name = "disponibilidad_id")
+    private Disponibilidad disponibilidad;
+
     private LocalDateTime fechaCita;
     private String estado;
 
@@ -42,6 +46,12 @@ public class Cita {
     public void setEstado(String estado) {
         this.estado = estado;
     }
-    
+    public Disponibilidad getDisponibilidad() {
+        return disponibilidad;
+    }
+
+    public void setDisponibilidad(Disponibilidad disponibilidad) {
+        this.disponibilidad = disponibilidad;
+    }
     
 }

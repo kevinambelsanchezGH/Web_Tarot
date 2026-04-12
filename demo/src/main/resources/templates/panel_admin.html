@@ -3,6 +3,14 @@
 <body>
     <h1>Gestión de Citas</h1>
 
+<div style="margin-bottom: 30px; padding: 15px; border: 1px solid #ccc;">
+    <h3>Añadir nuevo hueco libre</h3>
+    <form action="/admin/agregar-fecha" method="post">
+        <input type="datetime-local" name="fechaHora" required>
+        <button type="submit">Publicar hueco</button>
+    </form>
+</div>
+
    <table border="1">
     <thead>
         <tr>
