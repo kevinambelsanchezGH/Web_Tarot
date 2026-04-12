@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan(basePackages = "com.example.demo") // <--- ESTO FUERZA A SPRING A BUSCAR EN TODAS TUS CARPETAS
+@ComponentScan(basePackages = "com.example.demo") // <--- ESTO LO PONGO PORQUE NO HAY MANERA DE QUE ENCUENTRE EL PANEL_ADMIN
 public class DemoApplication {
     public static void main(String[] args) {
         SpringApplication.run(DemoApplication.class, args);

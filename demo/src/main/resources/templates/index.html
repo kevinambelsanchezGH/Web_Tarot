@@ -21,7 +21,15 @@
         <input type="text" name="instagram" placeholder="Usuario de Instagram" required>
         <input type="text" name="telefono" placeholder="Teléfono móvil (Opcional)">
         <input type="email" name="email" placeholder="Email (Opcional)">
-        <input type="datetime-local" name="fechaCita" required>
+        <label for="fecha">Selecciona tu cita:</label>
+<label for="fecha">Selecciona tu cita:</label>
+<select name="disponibilidadId" required>
+    <option value="" disabled selected>-- Elige un día y hora --</option>
+    <option th:each="h : ${huecosDisponibles}" 
+            th:value="${h.id}" 
+            th:text="${#temporals.format(h.fechaHora, 'dd/MM/yyyy HH:mm')}">
+    </option>
+</select>
         <button type="submit">Reservar Cita</button>
    </form>    
     </div>
