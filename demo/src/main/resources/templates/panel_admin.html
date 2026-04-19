@@ -3,39 +3,49 @@
 <body>
     <h1>Gestión de Citas</h1>
 
-<div style="margin-bottom: 30px; padding: 15px; border: 1px solid #ccc;">
-    <h3>Añadir nuevo hueco libre</h3>
-    <form action="/admin/agregar-fecha" method="post">
-        <input type="datetime-local" name="fechaHora" required>
-        <button type="submit">Publicar hueco</button>
-    </form>
-</div>
+    <div style="margin-bottom: 30px; padding: 15px; border: 1px solid #ccc;">
+        <h3>Añadir nuevo hueco libre</h3>
+        <form action="/admin/agregar-fecha" method="post">
+            <input type="datetime-local" name="fechaHora" required>
+            <button type="submit">Publicar hueco</button>
+        </form>
+    </div>
 
-   <table border="1">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Fecha</th>
-            <th>Estado</th>
-            <th>Nombre</th>
-            <th>Apellidos</th>
-            <th>Teléfono</th>
-            <th>Email</th>
-            <th>Instagram</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr th:each="cita : ${citas}">
-            <td th:text="${cita.id}"></td>
-            <td th:text="${cita.fechaCita}"></td>
-            <td th:text="${cita.estado}"></td>
-            <td th:text="${cita.usuario != null ? cita.usuario.nombre : 'N/A'}"></td>
-            <td th:text="${cita.usuario != null ? cita.usuario.apellidos : 'N/A'}"></td>
-            <td th:text="${cita.usuario != null ? cita.usuario.telefono : 'N/A'}"></td>
-            <td th:text="${cita.usuario != null ? cita.usuario.email : 'N/A'}"></td>
-            <td th:text="${cita.usuario != null ? cita.usuario.instagram : 'N/A'}"></td>
-        </tr>
-    </tbody>
-</table>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+                <th>Nombre</th>
+                <th>Apellidos</th>
+                <th>Teléfono</th>
+                <th>Email</th>
+                <th>Instagram</th>
+                <th>Acciones</th> </tr>
+        </thead>
+        <tbody>
+            <tr th:each="cita : ${citas}">
+                <td th:text="${cita.id}"></td>
+                <td th:text="${cita.fechaCita != null ? #temporals.format(cita.fechaCita, 'dd/MM/yyyy HH:mm') : 'Sin fecha'}"></td>
+                <td th:text="${cita.estado}"></td>
+                
+                <td th:text="${cita.nombre != null ? cita.nombre : 'N/A'}"></td>
+                <td th:text="${cita.apellidos != null ? cita.apellidos : 'N/A'}"></td>
+                <td th:text="${cita.telefono != null ? cita.telefono : 'N/A'}"></td>
+                <td th:text="${cita.email != null ? cita.email : 'N/A'}"></td>
+                <td th:text="${cita.instagram != null ? cita.instagram : 'N/A'}"></td>
+                
+                <td>
+                    <form action="/admin/eliminar-cita" method="post" 
+                          onsubmit="return confirm('¿Seguro que quieres borrar esta cita?');" style="display:inline;">
+                        <input type="hidden" name="id" th:value="${cita.id}">
+                        <button type="submit" style="background-color: #ff4d4d; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px;">
+                            Eliminar
+                        </button>
+                    </form>
+                </td>
+            </tr> </tbody>
+    </table>
 </body>
 </html>

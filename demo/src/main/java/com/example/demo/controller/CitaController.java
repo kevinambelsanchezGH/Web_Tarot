@@ -3,10 +3,17 @@ package com.example.demo.controller;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Collections;
 
 import com.example.demo.model.Cita;
 import com.example.demo.model.Disponibilidad;
@@ -45,19 +52,47 @@ public String agregarFecha(@RequestParam("fechaHora") String fechaHora) {
     disponibilidadRepository.save(d);
     return "redirect:/admin";
 }
-@PostMapping("/citas/guardar")
-public String guardarCita(@RequestParam Long disponibilidadId, Cita cita) {
-    // 1. Buscamos el hueco elegido
-    Disponibilidad hueco = disponibilidadRepository.findById(disponibilidadId).orElseThrow();
-    
-    // 2. Lo marcamos como ocupado para que desaparezca del desplegable
-    hueco.setReservada(true);
-    disponibilidadRepository.save(hueco);
-    
-    // 3. Guardamos la cita asociada al hueco
-    cita.setDisponibilidad(hueco); // Asegúrate de tener este set en tu entidad Cita
-    citaRepository.save(cita);
-    
-    return "redirect:/"; // Vuelve al inicio o a una página de confirmación
+@GetMapping("/") // O la ruta que use tu index
+public String mostrarIndex(Model model) {
+    // Esto es lo que llena la variable ${huecosDisponibles} de tu HTML
+    model.addAttribute("huecosDisponibles", disponibilidadRepository.findByReservadaFalse());
+    return "index"; 
+}
+@PostMapping("/admin/eliminar-cita")
+public String eliminarCita(@RequestParam("id") Long id) {
+    citaRepository.deleteById(id);
+    return "redirect:/admin"; // Al terminar, recarga el panel automáticamente
+}
+@PostMapping("/guardar")
+@ResponseBody
+public ResponseEntity<?> guardarCita(@ModelAttribute Cita cita, @RequestParam Long disponibilidadId) {
+    try {
+        // 1. Buscamos el hueco
+        Disponibilidad hueco = disponibilidadRepository.findById(disponibilidadId)
+            .orElseThrow(() -> new RuntimeException("Hueco no encontrado"));
+
+        // 2. Le pasamos la FECHA (lo que hicimos antes)
+        cita.setFechaCita(hueco.getFechaHora());
+        
+        // 3. ¡ESTO ES LO NUEVO!: Le pasamos el OBJETO disponibilidad a la cita
+        // Asegúrate de que en tu clase Cita el atributo se llame "disponibilidad" o similar
+        cita.setDisponibilidad(hueco); 
+        
+        // 4. Si tienes un campo estado, ponlo como pendiente de pago
+        cita.setEstado("PENDIENTE");
+
+        // 5. Guardamos la cita
+        citaRepository.save(cita);
+        
+        // 6. Marcamos el hueco como reservado (mejor que borrarlo por ahora)
+        hueco.setReservada(true);
+        disponibilidadRepository.save(hueco);
+
+        return ResponseEntity.ok().body(Map.of("status", "ok"));
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+    }
 }
 }
