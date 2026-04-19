@@ -1,20 +1,16 @@
 package com.example.demo.controller;
 
 import java.time.LocalDateTime;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.Collections;
-
+import java.util.List;
 import com.example.demo.model.Cita;
 import com.example.demo.model.Disponibilidad;
 import com.example.demo.repository.CitaRepository;
@@ -30,18 +26,28 @@ public class CitaController {
     @Autowired
     private DisponibilidadRepository disponibilidadRepository;
 
+
 @GetMapping("/admin")
-public String mostrarPanelAdmin(Model model) {
-    System.out.println("¡Entrando en el controlador!");
-    
-    var listaCitas = citaRepository.findAll();
-    
-  
-    System.out.println("Número de registros encontrados: " + listaCitas.size());
-    
+public String mostrarPanel(Model model) {
+    // 1. Esto es lo que ya tienes y hace que se vea la fila de "Kevin Ambel"
+    List<Cita> listaCitas = citaRepository.findAll();
     model.addAttribute("citas", listaCitas);
-    return "panel_admin"; 
     
+    // 2. ESTO ES LO QUE TE FALTA:
+    // Tienes que traer los datos de la tabla disponibilidad y pasarlos como "huecos"
+    List<Disponibilidad> listaHuecos = disponibilidadRepository.findAll();
+    model.addAttribute("huecos", listaHuecos);
+    
+    return "panel_admin"; 
+}
+
+@PostMapping("/admin/eliminar-hueco")
+public String eliminarHueco(@RequestParam("id") Long id) {
+    // Borramos el hueco de la base de datos usando su ID
+    disponibilidadRepository.deleteById(id);
+    
+    // Volvemos al panel para que el hueco ya no aparezca
+    return "redirect:/admin";
 }
 
 @PostMapping("/admin/agregar-fecha")
