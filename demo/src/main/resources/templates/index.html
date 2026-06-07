@@ -5,7 +5,7 @@
     <title>Dualtarot</title>
     <meta charset="UTF-8">
     <title>Cita Tarot</title>
-    <link rel="stylesheet" href="/css/estilo.css">
+    <link rel="stylesheet" th:href="@{/css/estilo.css}">
 </head>
 <body>
     
@@ -37,38 +37,44 @@
   <script>
     function procesarReserva() {
         const form = document.getElementById('formReserva');
-        const citaId = document.getElementById('citaSelect').value;
-
+        
         if (!form.checkValidity()) {
-            form.reportValidity(); // Muestra los avisos de "campo requerido" si falta algo
+            form.reportValidity();
             return;
         }
 
-        // 1. Enviamos los datos del formulario a tu controlador actual para guardar la cita
         const formData = new FormData(form);
         
+        // 1. Guardamos la cita primero
         fetch('/guardar', {
             method: 'POST',
             body: formData
         })
         .then(response => {
-            if (response.ok) {
-                // 2. Si se guardó bien, ahora pedimos la URL de Stripe
-                return fetch('/crear-sesion-pago?citaId=' + citaId, { method: 'POST' });
+            if (!response.ok) throw new Error("Error al guardar la reserva");
+            return response.json(); // Leemos el JSON que enviamos desde el controlador
+        })
+        .then(data => {
+            // data.citaId es el ID REAL que nos acaba de dar Java tras el save
+            if (data.status === 'ok' && data.citaId) {
+                
+                // 2. Ahora pedimos la URL de Stripe usando EL ID DE LA CITA
+                return fetch('/crear-sesion-pago?citaId=' + data.citaId, { method: 'POST' });
+            } else {
+                throw new Error("No se recibió el ID de la cita");
             }
-            throw new Error("Error al guardar la reserva");
         })
         .then(response => response.json())
         .then(data => {
             if (data.url) {
-                window.location.href = data.url; // ¡A pagar!
+                window.location.href = data.url; // ¡A pagar con el ID correcto!
             } else {
                 alert("Error en la pasarela: " + data.error);
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert("Hubo un problema al procesar la reserva");
+            alert("Hubo un problema: " + error.message);
         });
     }
 </script>

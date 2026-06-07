@@ -73,28 +73,27 @@ public String eliminarCita(@RequestParam("id") Long id) {
 @ResponseBody
 public ResponseEntity<?> guardarCita(@ModelAttribute Cita cita, @RequestParam Long disponibilidadId) {
     try {
-        // 1. Buscamos el hueco
+        // 1. Buscamos el hueco (Aquí es donde se crea la variable 'hueco')
         Disponibilidad hueco = disponibilidadRepository.findById(disponibilidadId)
             .orElseThrow(() -> new RuntimeException("Hueco no encontrado"));
 
-        // 2. Le pasamos la FECHA (lo que hicimos antes)
+        // 2. Configuramos la cita con los datos del hueco
         cita.setFechaCita(hueco.getFechaHora());
-        
-        // 3. ¡ESTO ES LO NUEVO!: Le pasamos el OBJETO disponibilidad a la cita
-        // Asegúrate de que en tu clase Cita el atributo se llame "disponibilidad" o similar
         cita.setDisponibilidad(hueco); 
-        
-        // 4. Si tienes un campo estado, ponlo como pendiente de pago
         cita.setEstado("PENDIENTE");
 
-        // 5. Guardamos la cita
-        citaRepository.save(cita);
+        // 3. Guardamos la cita y capturamos el objeto con su ID real
+        Cita citaGuardada = citaRepository.save(cita); 
         
-        // 6. Marcamos el hueco como reservado (mejor que borrarlo por ahora)
+        // 4. Ahora sí, marcamos el hueco como reservado
         hueco.setReservada(true);
         disponibilidadRepository.save(hueco);
 
-        return ResponseEntity.ok().body(Map.of("status", "ok"));
+        // 5. Devolvemos el ID de la CITA (no del hueco) al frontend
+        return ResponseEntity.ok().body(Map.of(
+            "status", "ok",
+            "citaId", citaGuardada.getId()
+        ));
 
     } catch (Exception e) {
         e.printStackTrace();
@@ -102,3 +101,4 @@ public ResponseEntity<?> guardarCita(@ModelAttribute Cita cita, @RequestParam Lo
     }
 }
 }
+
