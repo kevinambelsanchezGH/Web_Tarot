@@ -19,8 +19,13 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable()) // Deshabilitamos CSRF para que tus formularios de admin sigan funcionando fácil
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/admin/**").hasRole("ADMIN") // Solo el admin requiere login y el rol ADMIN
-                .anyRequest().permitAll() // Todo lo demás (index, pago, css) es público
+                // 1. RUTAS PÚBLICAS: Todo el mundo puede ver la web, el CSS y hacer el proceso de pago
+                .requestMatchers("/", "/css/**", "/js/**", "/favicon.ico", "/error", "/sobre-mi.html").permitAll()
+                .requestMatchers("/guardar", "/crear-sesion-pago", "/pago-exito", "/pago-cancelado").permitAll()
+                // 2. RUTAS PRIVADAS: Solo tú (con rol ADMIN) puedes entrar a cualquier cosa que empiece por /admin
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                // 3. SEGURIDAD EXTRA: Cualquier otra ruta no definida requerirá estar logueado
+                .anyRequest().authenticated()
             )
             .formLogin(withDefaults()) // Usa el formulario de login por defecto de Spring
             .logout(logout -> logout.logoutSuccessUrl("/")); // Al cerrar sesión, vuelve al inicio

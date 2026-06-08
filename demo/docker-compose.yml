@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  # El contenedor de tu base de datos MySQL
+  contenedor-mysql:
+    image: mysql:8.0
+    container_name: mysql_dualtarot
+    restart: always
+    environment:
+      MYSQL_DATABASE: tarot_db
+      MYSQL_ROOT_PASSWORD: "***REMOVED***"
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  # El contenedor de tu aplicación de Java (Spring Boot)
+  app-web:
+    build: .
+    container_name: java_dualtarot
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - contenedor-mysql
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://contenedor-mysql:3306/tarot_db?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=***REMOVED***
+
+volumes:
+  db_data:
