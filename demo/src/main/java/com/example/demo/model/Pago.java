@@ -10,7 +10,7 @@ public class Pago {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Double importe;
-    private String metodoPago;//Bizum, Tarjeta, Paypal
+    private String metodoPago;
     private LocalDateTime fechaPago;
     private String estado;//PENDIENTE, COMPLETADO
 

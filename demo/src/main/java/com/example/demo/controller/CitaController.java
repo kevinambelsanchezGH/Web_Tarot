@@ -9,14 +9,17 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import java.util.Optional;
 import java.util.Map;
 import java.util.List;
 import com.example.demo.model.Cita;
 import com.example.demo.model.Disponibilidad;
+import com.example.demo.repository.PagoRepository;
 import com.example.demo.repository.CitaRepository;
 import com.example.demo.repository.DisponibilidadRepository;
 
 import org.springframework.ui.Model;
+import org.springframework.transaction.annotation.Transactional;
 
 @Controller
 public class CitaController {
@@ -25,16 +28,17 @@ public class CitaController {
     private CitaRepository citaRepository;
     @Autowired
     private DisponibilidadRepository disponibilidadRepository;
+    @Autowired
+    private PagoRepository pagoRepository;
 
 
 @GetMapping("/admin")
 public String mostrarPanel(Model model) {
-    // 1. Esto es lo que ya tienes y hace que se vea la fila de "Kevin Ambel"
+   
     List<Cita> listaCitas = citaRepository.findAll();
     model.addAttribute("citas", listaCitas);
     
-    // 2. ESTO ES LO QUE TE FALTA:
-    // Tienes que traer los datos de la tabla disponibilidad y pasarlos como "huecos"
+ 
     List<Disponibilidad> listaHuecos = disponibilidadRepository.findAll();
     model.addAttribute("huecos", listaHuecos);
     
@@ -58,38 +62,51 @@ public String agregarFecha(@RequestParam("fechaHora") String fechaHora) {
     disponibilidadRepository.save(d);
     return "redirect:/admin";
 }
-@GetMapping("/") // O la ruta que use tu index
+@GetMapping("/") 
 public String mostrarIndex(Model model) {
-    // Esto es lo que llena la variable ${huecosDisponibles} de tu HTML
+    // Esto es lo que llena la variable ${huecosDisponibles} del HTML
     model.addAttribute("huecosDisponibles", disponibilidadRepository.findByReservadaFalse());
     return "index"; 
 }
+
+@Transactional
 @PostMapping("/admin/eliminar-cita")
 public String eliminarCita(@RequestParam("id") Long id) {
+    // 1. Borramos primero el pago asociado para que la base de datos nos deje borrar la cita
+    // (Asegúrate de que en PagoRepository.java tengas el método: void deleteByCitaId(Long id);)
+    pagoRepository.deleteByCitaId(id);
+
+    // 2. Ahora borramos la cita directamente por su ID
     citaRepository.deleteById(id);
-    return "redirect:/admin"; // Al terminar, recarga el panel automáticamente
+
+    return "redirect:/admin"; 
 }
 @PostMapping("/guardar")
 @ResponseBody
+@Transactional // 1 sola transacción a la vez
 public ResponseEntity<?> guardarCita(@ModelAttribute Cita cita, @RequestParam Long disponibilidadId) {
     try {
-        // 1. Buscamos el hueco (Aquí es donde se crea la variable 'hueco')
-        Disponibilidad hueco = disponibilidadRepository.findById(disponibilidadId)
+        // 1. Busco el hueco con bloqueo pesimista. Bloquea la fila hasta que este método termine.
+        Disponibilidad hueco = disponibilidadRepository.findByIdWithLock(disponibilidadId)
             .orElseThrow(() -> new RuntimeException("Hueco no encontrado"));
 
-        // 2. Configuramos la cita con los datos del hueco
+        // 2. VERIFICO si el hueco ya está reservado *después* de adquirir el lock.
+        if (hueco.isReservada()) {
+            return ResponseEntity.status(409).body(Map.of("error", "El hueco ya ha sido reservado por otro usuario."));
+        }
+        // 2. Configuro la cita con los datos del hueco
         cita.setFechaCita(hueco.getFechaHora());
         cita.setDisponibilidad(hueco); 
         cita.setEstado("PENDIENTE");
 
-        // 3. Guardamos la cita y capturamos el objeto con su ID real
+        // 3. Guardo la cita y capturo el objeto con su ID real
         Cita citaGuardada = citaRepository.save(cita); 
         
-        // 4. Ahora sí, marcamos el hueco como reservado
+        // 4. Ahora sí, marco el hueco como reservado
         hueco.setReservada(true);
         disponibilidadRepository.save(hueco);
 
-        // 5. Devolvemos el ID de la CITA (no del hueco) al frontend
+        // 5. Devuelvo el ID de la CITA (no del hueco) al frontend
         return ResponseEntity.ok().body(Map.of(
             "status", "ok",
             "citaId", citaGuardada.getId()

@@ -76,5 +76,5 @@ public class Usuario {
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private List<Cita> citas;
 
-    // Constructores, Getters y Setters
+    
 }

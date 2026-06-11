@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # El contenedor de tu base de datos MySQL
+  # El contenedor de mi base de datos MySQL
   contenedor-mysql:
     image: mysql:8.0
     container_name: mysql_dualtarot
@@ -14,7 +14,7 @@ services:
     volumes:
       - db_data:/var/lib/mysql
 
-  # El contenedor de tu aplicación de Java (Spring Boot)
+  # El contenedor de mi aplicación de Java (Spring Boot)
   app-web:
     build: .
     container_name: java_dualtarot

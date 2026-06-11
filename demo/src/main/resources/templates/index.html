@@ -45,14 +45,14 @@
 
         const formData = new FormData(form);
         
-        // 1. Guardamos la cita primero
+        // Se guarda la cita primero
         fetch('/guardar', {
             method: 'POST',
             body: formData
         })
         .then(response => {
             if (!response.ok) throw new Error("Error al guardar la reserva");
-            return response.json(); // Leemos el JSON que enviamos desde el controlador
+            return response.json(); 
         })
         .then(data => {
             // data.citaId es el ID REAL que nos acaba de dar Java tras el save

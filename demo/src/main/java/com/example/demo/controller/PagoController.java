@@ -1,7 +1,9 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.Cita;
+import com.example.demo.model.Pago;
 import com.example.demo.repository.CitaRepository;
+import com.example.demo.repository.PagoRepository;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import java.time.LocalDateTime;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -24,6 +27,9 @@ public class PagoController {
 
     @Autowired
     private CitaRepository citaRepository;
+    
+    @Autowired
+    private PagoRepository pagoRepository;
 
     @Value("${stripe.api.key}")
     private String stripeApiKey;
@@ -33,7 +39,7 @@ public class PagoController {
     public Map<String, String> crearSesion(@RequestParam Long citaId) {
         Stripe.apiKey = stripeApiKey;
 
-        // Buscamos la cita real para asegurarnos de que el ID que mandamos a Stripe existe
+        // Busco la cita real para asegurarme de que el ID que mando a Stripe existe
         Optional<Cita> citaCheck = citaRepository.findById(citaId);
         if (citaCheck.isEmpty()) {
             Map<String, String> errorRes = new HashMap<>();
@@ -86,7 +92,16 @@ public class PagoController {
                 Cita cita = citaOpt.get();
                 cita.setEstado("PAGADO"); // Cambiamos estado
                 citaRepository.save(cita); // Guardamos en BD
-                
+
+                // Creamos y guardamos el objeto Pago
+                Pago pago = new Pago();
+                pago.setCita(cita);
+                pago.setImporte(70.00); // El importe es 70.00€ según la configuración de Stripe (7000L cents)
+                pago.setMetodoPago("Stripe Card"); // Se puede mejorar obteniendo el método de pago real de Stripe
+                pago.setFechaPago(LocalDateTime.now());
+                pago.setEstado("COMPLETADO");
+                pagoRepository.save(pago);
+
                 System.out.println("EXITO: Cita " + id + " actualizada a PAGADO");
                 model.addAttribute("nombre", cita.getNombre());
                 return "pago_exito"; // Carga pago_exito.html
