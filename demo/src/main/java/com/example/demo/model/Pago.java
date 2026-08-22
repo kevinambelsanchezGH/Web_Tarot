@@ -2,15 +2,22 @@ package com.example.demo.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+
+// Entidad que representa el pago realizado (vía Stripe) para una cita.
+// Se guarda en la tabla "pagos".
 @Entity
 @Table(name = "pagos")
 
 public class Pago {
+    // Identificador único autogenerado por la base de datos
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    // Cantidad cobrada
     private Double importe;
+    // Cómo se pagó (ej. "Stripe Card")
     private String metodoPago;
+    // Cuándo se registró el pago
     private LocalDateTime fechaPago;
     private String estado;//PENDIENTE, COMPLETADO
 
@@ -67,7 +74,8 @@ public class Pago {
         this.cita = cita;
     }
 
+    // Constructor vacío requerido por JPA
     public Pago() {}
 
-    
+
 }

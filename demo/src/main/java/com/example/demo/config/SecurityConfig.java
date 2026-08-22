@@ -10,10 +10,13 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import static org.springframework.security.config.Customizer.withDefaults;
 
+// Esta clase configura la seguridad de toda la aplicación: qué rutas son públicas,
+// cuáles requieren estar logueado, y quién puede entrar al panel de administración.
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
+    // Este bean define las reglas de acceso (el "firewall" de Spring Security).
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -29,10 +32,12 @@ public class SecurityConfig {
             )
             .formLogin(withDefaults()) // Usa el formulario de login por defecto de Spring
             .logout(logout -> logout.logoutSuccessUrl("/")); // Al cerrar sesión, vuelve al inicio
-        
+
+        // Construye y devuelve la cadena de filtros de seguridad ya configurada
         return http.build();
     }
 
+    // Este bean crea el (único) usuario administrador, guardado en memoria (no en la base de datos).
     @Bean
     public InMemoryUserDetailsManager userDetailsService() {
         // Usamos {noop} para contraseñas en texto plano (ideal para TFG/Desarrollo)
@@ -41,6 +46,7 @@ public class SecurityConfig {
             .password("{noop}***REMOVED***")
             .roles("ADMIN")
             .build();
+        // Registra ese único usuario en un gestor de usuarios en memoria
         return new InMemoryUserDetailsManager(user);
     }
 }
