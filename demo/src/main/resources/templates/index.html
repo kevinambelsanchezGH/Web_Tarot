@@ -1,23 +1,24 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Dualtarot</title>
-    <meta charset="UTF-8">
-    <title>Cita Tarot</title>
+    <title>Dualtarot | Reserva tu sesión</title>
     <link rel="stylesheet" th:href="@{/css/estilo.css}">
 </head>
 <body>
-    
+
     <div class="nav-links">
     <a href="sobre-mi.html" class="sobre-mi-link">✨ Sobre mí</a>
     </div>
 
   <div class="card">
-    <h2>Sesiones privadas Dualtarot</h2>
+    <h2>🔮 Sesiones privadas Dualtarot</h2>
+    <p class="subtitle">Reserva tu cita y descubre lo que las cartas tienen para ti</p>
     <form id="formReserva">
-        <input type="text" name="nombre" id="nombre" placeholder="Nombre" required>
-        <input type="text" name="apellidos" id="apellidos" placeholder="Apellidos">
+        <div class="form-row">
+            <input type="text" name="nombre" id="nombre" placeholder="Nombre" required>
+            <input type="text" name="apellidos" id="apellidos" placeholder="Apellidos">
+        </div>
         <input type="text" name="instagram" id="instagram" placeholder="Usuario de Instagram" required>
         <input type="text" name="telefono" id="telefono" placeholder="Teléfono móvil (Opcional)">
         <input type="email" name="email" id="email" placeholder="Email (Opcional)">

@@ -82,6 +82,12 @@ public String mostrarIndex(Model model) {
     return "index";
 }
 
+// Página de login personalizada del panel de administración
+@GetMapping("/login")
+public String mostrarLogin() {
+    return "login";
+}
+
 // Elimina una cita y, antes, su pago asociado (si lo tuviera), para no romper la relación en BD.
 @Transactional
 @PostMapping("/admin/eliminar-cita")

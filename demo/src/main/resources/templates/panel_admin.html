@@ -1,76 +1,89 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Gestión de Citas</title>
+    <title>Panel de Administración | Dualtarot</title>
+    <link rel="stylesheet" th:href="@{/css/estilo.css}">
 </head>
-<body>
-    <h1>Gestión de Citas</h1>
+<body class="panel-admin">
 
-    <div style="margin-bottom: 30px; padding: 15px; border: 1px solid #ccc;">
-        <h3>Añadir nuevo hueco libre</h3>
-        <form action="/admin/agregar-fecha" method="post">
-            <input type="datetime-local" name="fechaHora" required>
-            <button type="submit">Publicar hueco</button>
+    <header class="admin-header">
+        <h1>🔮 Panel de Administración</h1>
+        <form action="/logout" method="post">
+            <button type="submit" class="btn-logout">Cerrar sesión</button>
         </form>
+    </header>
+
+    <div class="admin-container">
+
+        <section class="admin-card">
+            <h2>Añadir nuevo hueco libre</h2>
+            <form action="/admin/agregar-fecha" method="post" class="inline-form">
+                <input type="datetime-local" name="fechaHora" required>
+                <button type="submit" class="btn">Publicar hueco</button>
+            </form>
+        </section>
+
+        <section class="admin-card">
+            <h2>Huecos publicados (libres)</h2>
+            <ul class="huecos-list">
+                <th:block th:each="h : ${huecos}">
+                    <li th:if="${!h.reservada}" class="hueco-item">
+                        <span th:text="${#temporals.format(h.fechaHora, 'dd/MM/yyyy HH:mm')}"></span>
+
+                        <form action="/admin/eliminar-hueco" method="post" class="inline-form">
+                            <input type="hidden" name="id" th:value="${h.id}">
+                            <button type="submit" class="btn-small btn-outline">Eliminar hueco</button>
+                        </form>
+                    </li>
+                </th:block>
+            </ul>
+        </section>
+
+        <section class="admin-card">
+            <h2>Citas reservadas</h2>
+            <div class="table-wrapper">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Fecha</th>
+                            <th>Estado</th>
+                            <th>Nombre</th>
+                            <th>Apellidos</th>
+                            <th>Teléfono</th>
+                            <th>Email</th>
+                            <th>Instagram</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="cita : ${citas}">
+                            <td th:text="${cita.id}"></td>
+                            <td th:text="${cita.fechaCita != null ? #temporals.format(cita.fechaCita, 'dd/MM/yyyy HH:mm') : 'Sin fecha'}"></td>
+                            <td>
+                                <span class="badge" th:classappend="${cita.estado == 'PAGADO'} ? 'badge-success' : 'badge-pending'" th:text="${cita.estado}"></span>
+                            </td>
+                            <td th:text="${cita.nombre ?: 'N/A'}"></td>
+                            <td th:text="${cita.apellidos ?: 'N/A'}"></td>
+                            <td th:text="${cita.telefono ?: 'N/A'}"></td>
+                            <td th:text="${cita.email ?: 'N/A'}"></td>
+                            <td th:text="${cita.instagram ?: 'N/A'}"></td>
+                            <td>
+                                <form action="/admin/eliminar-cita" method="post"
+                                      onsubmit="return confirm('¿Seguro que quieres borrar esta cita?');">
+                                    <input type="hidden" name="id" th:value="${cita.id}">
+                                    <button type="submit" class="btn-small btn-danger">
+                                        Eliminar
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
     </div>
-
-    <div style="margin-bottom: 30px;">
-        <h3>Huecos que has publicado (Libres)</h3>
-        <ul>
-            <th:block th:each="h : ${huecos}">
-                <li th:if="${!h.reservada}" style="margin-bottom: 5px;">
-                    <span th:text="${#temporals.format(h.fechaHora, 'dd/MM/yyyy HH:mm')}"></span>
-                    
-                    <form action="/admin/eliminar-hueco" method="post" style="display:inline; margin-left: 10px;">
-                        <input type="hidden" name="id" th:value="${h.id}">
-                        <button type="submit" style="font-size: 0.8em;">Eliminar hueco</button>
-                    </form>
-                </li>
-            </th:block>
-        </ul>
-    </div>
-
-    <hr>
-
-    <h3>Citas reservadas</h3>
-    <table border="1" style="width: 100%; text-align: left;">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Fecha</th>
-                <th>Estado</th>
-                <th>Nombre</th>
-                <th>Apellidos</th>
-                <th>Teléfono</th>
-                <th>Email</th>
-                <th>Instagram</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="cita : ${citas}">
-                <td th:text="${cita.id}"></td>
-                <td th:text="${cita.fechaCita != null ? #temporals.format(cita.fechaCita, 'dd/MM/yyyy HH:mm') : 'Sin fecha'}"></td>
-                <td th:text="${cita.estado}"></td>
-                
-                <td th:text="${cita.nombre ?: 'N/A'}"></td>
-                <td th:text="${cita.apellidos ?: 'N/A'}"></td>
-                <td th:text="${cita.telefono ?: 'N/A'}"></td>
-                <td th:text="${cita.email ?: 'N/A'}"></td>
-                <td th:text="${cita.instagram ?: 'N/A'}"></td>
-                
-                <td>
-                    <form action="/admin/eliminar-cita" method="post" 
-                          onsubmit="return confirm('¿Seguro que quieres borrar esta cita?');">
-                        <input type="hidden" name="id" th:value="${cita.id}">
-                        <button type="submit" style="background-color: #ff4d4d; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px;">
-                            Eliminar
-                        </button>
-                    </form>
-                </td>
-            </tr>
-        </tbody>
-    </table>
 </body>
 </html>

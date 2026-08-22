@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Iniciar sesión | Dualtarot</title>
+    <link rel="stylesheet" th:href="@{/css/estilo.css}">
+</head>
+<body>
+
+    <div class="card">
+        <h2>🔮 Acceso privado</h2>
+        <p class="login-subtitle">Panel de administración de Dualtarot</p>
+
+        <p class="alert alert-error" th:if="${param.error}">Usuario o contraseña incorrectos.</p>
+        <p class="alert alert-success" th:if="${param.logout}">Sesión cerrada correctamente.</p>
+
+        <form th:action="@{/login}" method="post">
+            <input type="text" name="username" placeholder="Usuario" required autofocus>
+            <input type="password" name="password" placeholder="Contraseña" required>
+            <button type="submit">Entrar</button>
+        </form>
+
+        <a href="/" class="back-link">← Volver a la web</a>
+    </div>
+
+</body>
+</html>
