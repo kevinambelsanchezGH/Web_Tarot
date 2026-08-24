@@ -34,6 +34,7 @@ public class SecurityConfig {
             )
             .formLogin(form -> form
                 .loginPage("/login") // Usamos nuestra propia página de login en español
+                .defaultSuccessUrl("/admin", true)
                 .permitAll()
             )
             .logout(logout -> logout.logoutSuccessUrl("/")); // Al cerrar sesión, vuelve al inicio

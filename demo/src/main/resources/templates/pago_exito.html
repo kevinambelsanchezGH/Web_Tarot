@@ -1,20 +1,17 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>¡Reserva Confirmada!</title>
-    <style>
-        body { font-family: sans-serif; text-align: center; padding-top: 50px; }
-        .card { border: 1px solid #ddd; padding: 20px; display: inline-block; border-radius: 10px; }
-        .btn { background: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Reserva Confirmada! | Dualtarot</title>
+    <link rel="stylesheet" th:href="@{/css/estilo.css}">
 </head>
 <body>
     <div class="card">
-        <h1>¡Pago completado! ✅</h1>
-        <p>Gracias <strong th:text="${nombre}">Usuario</strong>, tu cita ya está confirmada.</p>
-        <br>
-        <a href="/" class="btn">Volver a la web</a>
+        <div class="success-icon">✅</div>
+        <h2>¡Pago completado!</h2>
+        <p class="subtitle">Gracias <strong th:text="${nombre}">Usuario</strong>, tu cita ya está confirmada.</p>
+        <a href="/" class="btn-link">Volver a la web</a>
     </div>
 </body>
 </html>
