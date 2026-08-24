@@ -35,3 +35,6 @@ build/
 # Docker
 .docker/
 docker-volumes/
+
+### Credenciales ###
+.env

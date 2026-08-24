@@ -9,7 +9,7 @@
 
     <header class="admin-header">
         <h1>🔮 Panel de Administración</h1>
-        <form action="/logout" method="post">
+        <form th:action="@{/logout}" method="post">
             <button type="submit" class="btn-logout">Cerrar sesión</button>
         </form>
     </header>
@@ -18,7 +18,7 @@
 
         <section class="admin-card">
             <h2>Añadir nuevo hueco libre</h2>
-            <form action="/admin/agregar-fecha" method="post" class="inline-form">
+            <form th:action="@{/admin/agregar-fecha}" method="post" class="inline-form">
                 <input type="datetime-local" name="fechaHora" required>
                 <button type="submit" class="btn">Publicar hueco</button>
             </form>
@@ -31,7 +31,7 @@
                     <li th:if="${!h.reservada}" class="hueco-item">
                         <span th:text="${#temporals.format(h.fechaHora, 'dd/MM/yyyy HH:mm')}"></span>
 
-                        <form action="/admin/eliminar-hueco" method="post" class="inline-form">
+                        <form th:action="@{/admin/eliminar-hueco}" method="post" class="inline-form">
                             <input type="hidden" name="id" th:value="${h.id}">
                             <button type="submit" class="btn-small btn-outline">Eliminar hueco</button>
                         </form>
@@ -70,7 +70,7 @@
                             <td th:text="${cita.email ?: 'N/A'}"></td>
                             <td th:text="${cita.instagram ?: 'N/A'}"></td>
                             <td>
-                                <form action="/admin/eliminar-cita" method="post"
+                                <form th:action="@{/admin/eliminar-cita}" method="post"
                                       onsubmit="return confirm('¿Seguro que quieres borrar esta cita?');">
                                     <input type="hidden" name="id" th:value="${cita.id}">
                                     <button type="submit" class="btn-small btn-danger">
