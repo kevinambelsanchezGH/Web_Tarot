@@ -60,18 +60,8 @@
     <p><a th:href="@{/privacidad}">Política de privacidad</a></p>
   </footer>
 
+  <script src="/js/reveal.js"></script>
   <script>
-    const revealObserver = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('is-visible');
-                revealObserver.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.15 });
-
-    document.querySelectorAll('.reveal').forEach((el) => revealObserver.observe(el));
-
     function procesarReserva() {
         const form = document.getElementById('formReserva');
         

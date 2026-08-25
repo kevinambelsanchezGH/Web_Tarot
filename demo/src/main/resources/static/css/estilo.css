@@ -216,7 +216,8 @@ select:focus {
     display: block;
     text-align: center;
     margin-top: 20px;
-    color: var(20, 0, 20, 0.55);
+    color: rgb(97, 10, 97);
+    font-weight: 700;
     text-decoration: none;
     font-size: 0.85rem;
 }
@@ -489,6 +490,122 @@ body.panel-admin {
     margin: 5px 0;
     color: rgba(255, 255, 255, 0.8);
 }
+
+/* ---------- Sobre mí ---------- */
+
+.sobre-mi-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.bio-card {
+    max-width: 800px;
+    text-align: left;
+    line-height: 1.7;
+}
+
+.bio-card h2 {
+    text-align: center;
+}
+
+.bio-card p {
+    margin: 12px 0;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.book-card {
+    max-width: 800px;
+}
+
+.book-content {
+    display: flex;
+    align-items: center;
+    gap: 35px;
+}
+
+.book-cover-wrap {
+    flex: 0 0 220px;
+    display: flex;
+    justify-content: center;
+}
+
+.book-cover {
+    width: 100%;
+    max-width: 220px;
+    border-radius: 14px;
+    display: block;
+    box-shadow: 0 0 25px rgba(212, 175, 55, 0.45), 0 0 65px rgba(212, 175, 55, 0.25);
+}
+
+.book-info {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+}
+
+.book-info h3 {
+    color: var(--oro);
+    font-size: 1rem;
+    letter-spacing: 1px;
+    margin: 0 0 5px;
+    text-transform: uppercase;
+}
+
+.book-info h4 {
+    color: var(--blanco-suave);
+    font-size: 1.25rem;
+    font-style: italic;
+    margin: 0 0 12px;
+}
+
+.book-info p {
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0 0 20px;
+    line-height: 1.6;
+}
+
+.book-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.buy-btn {
+    display: inline-block;
+    background: var(--oro);
+    color: var(--purpura-oscuro);
+    text-decoration: none;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    transition: 0.3s;
+}
+
+.buy-btn:hover {
+    background: #f1c40f;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.buy-btn.outline {
+    background: rgba(20, 0, 20, 0.35);
+    color: var(--oro);
+    border: 1px solid var(--oro);
+}
+
+.buy-btn.outline:hover {
+    background: rgba(20, 0, 20, 0.5);
+    transform: translateY(-2px);
+    box-shadow: none;
+}
+
 /* ---------- Responsive ---------- */
 
 @media (max-width: 768px) {
@@ -560,5 +677,22 @@ body.panel-admin {
     .admin-table td {
         padding: 8px 6px;
         font-size: 0.8rem;
+    }
+
+    .sobre-mi-wrap {
+        gap: 20px;
+    }
+
+    .book-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .book-info {
+        text-align: center;
+    }
+
+    .book-buttons {
+        justify-content: center;
     }
 }
