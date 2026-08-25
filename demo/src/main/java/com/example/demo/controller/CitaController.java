@@ -88,6 +88,12 @@ public String mostrarLogin() {
     return "login";
 }
 
+// Página de política de privacidad (RGPD)
+@GetMapping("/privacidad")
+public String mostrarPrivacidad() {
+    return "privacidad";
+}
+
 // Elimina una cita y, antes, su pago asociado (si lo tuviera), para no romper la relación en BD.
 @Transactional
 @PostMapping("/admin/eliminar-cita")

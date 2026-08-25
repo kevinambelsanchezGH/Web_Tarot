@@ -12,7 +12,24 @@
     <a href="sobre-mi.html" class="sobre-mi-link">✨ Sobre mí</a>
     </div>
 
-  <div class="card">
+    <div class="landing-grid">
+    <div class="card info-card reveal">
+    <h3>✨ ¿Cómo funciona?</h3>
+    <p>Las sesiones privadas se realizan por <strong>videollamada de Instagram</strong>. Selecciona el día y hora que prefieras de los huecos disponibles y confirma tu reserva con el pago.</p>
+    <p>Cada sesión tiene una duración de <strong>30 minutos</strong> por <strong>70€</strong>, durante los cuales podrás hacer todas las preguntas que necesites.</p>
+
+    <h3>💳 Pago y reserva</h3>
+    <p>El pago se realiza de forma segura a través de nuestra pasarela online. Una vez completado, tu cita quedará confirmada automáticamente.</p>
+
+    <h3>📋 Política de cancelación</h3>
+    <ul>
+        <li>En caso de retraso, los minutos perdidos no se recuperarán.</li>
+        <li>Si no puedes acudir, avisa con al menos <strong>24 horas de antelación</strong>. Sin aviso previo, se perderá el importe de la reserva.</li>
+        <li>No se realizan devoluciones, pero puedes cambiar la cita con previo aviso abonando un suplemento del <strong>50%</strong> del precio de la sesión.</li>
+    </ul>
+</div>
+
+  <div class="card reveal reveal-delay">
     <h2>🔮 Sesiones privadas Dualtarot</h2>
     <p class="subtitle">Reserva tu cita y descubre lo que las cartas tienen para ti</p>
     <form id="formReserva">
@@ -34,9 +51,27 @@
         </select>
         
         <button type="button" onclick="procesarReserva()">Reservar y Pagar</button>
-    </form>    
+    </form>
 </div>
+  </div>
+
+  <footer class="site-footer">
+    <p>🔒 Tus datos (nombre, contacto y detalles de la cita) se usan únicamente para gestionar tu reserva y el pago de la sesión. No los vendemos ni los compartimos con terceros, salvo la pasarela de pago (Stripe) necesaria para cobrar el servicio.</p>
+    <p><a th:href="@{/privacidad}">Política de privacidad</a></p>
+  </footer>
+
   <script>
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                revealObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.reveal').forEach((el) => revealObserver.observe(el));
+
     function procesarReserva() {
         const form = document.getElementById('formReserva');
         

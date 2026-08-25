@@ -25,7 +25,7 @@ public class SecurityConfig {
             .ignoringRequestMatchers("/guardar", "/crear-sesion-pago"))
             .authorizeHttpRequests(auth -> auth
                 // 1. RUTAS PÚBLICAS: Todo el mundo puede ver la web, el CSS y hacer el proceso de pago
-                .requestMatchers("/", "/css/**", "/js/**", "/favicon.ico", "/error", "/sobre-mi.html", "/login").permitAll()
+                .requestMatchers("/", "/css/**", "/js/**", "/favicon.ico", "/error", "/sobre-mi.html", "/login", "/privacidad").permitAll()
                 .requestMatchers("/guardar", "/crear-sesion-pago", "/pago-exito", "/pago-cancelado").permitAll()
                 // 2. RUTAS PRIVADAS: Solo tú (con rol ADMIN) puedes entrar a cualquier cosa que empiece por /admin
                 .requestMatchers("/admin/**").hasRole("ADMIN")
