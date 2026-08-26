@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Cita confirmada | Dualtarot</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f4f0fa; padding: 24px; margin: 0;">
+    <div style="max-width: 480px; margin: 0 auto; background: #ffffff; border-radius: 12px; padding: 32px; text-align: center;">
+        <h2 style="color: #4a2f7a; margin-top: 0;">✅ Cita confirmada</h2>
+        <p style="font-size: 16px; color: #333;">
+            Hola <strong th:text="${nombre}">Usuario</strong>, tu pago se ha completado y tu cita de tarot ya está reservada.
+        </p>
+        <p style="font-size: 18px; color: #4a2f7a; margin: 24px 0;">
+            📅 <strong th:text="${fecha}">01/01/2026</strong><br>
+            🕐 <strong th:text="${hora}">10:00</strong>
+        </p>
+        <p style="font-size: 14px; color: #666;">
+            Si necesitas cambiar o cancelar tu cita, contáctanos respondiendo a este correo.
+        </p>
+    </div>
+</body>
+</html>

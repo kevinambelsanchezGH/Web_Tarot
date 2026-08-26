@@ -38,3 +38,5 @@ docker-volumes/
 
 ### Credenciales ###
 .env
+secrets/
+*.google-calendar.json

@@ -28,6 +28,13 @@ services:
       - STRIPE_API_KEY=${STRIPE_API_KEY}
       - ADMIN_USERNAME=${ADMIN_USERNAME}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - GOOGLE_CALENDAR_CREDENTIALS_PATH=/app/secrets/google-calendar.json
+      - GOOGLE_CALENDAR_ID=${GOOGLE_CALENDAR_ID}
+      - GOOGLE_CALENDAR_EVENT_DURATION=${GOOGLE_CALENDAR_EVENT_DURATION}
+    volumes:
+      - ./secrets:/app/secrets:ro
 
 volumes:
   db_data:

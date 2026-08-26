@@ -4,6 +4,8 @@ import com.example.demo.model.Cita;
 import com.example.demo.model.Pago;
 import com.example.demo.repository.CitaRepository;
 import com.example.demo.repository.PagoRepository;
+import com.example.demo.service.EmailService;
+import com.example.demo.service.GoogleCalendarService;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
@@ -34,6 +36,14 @@ public class PagoController {
     // Acceso a la tabla de pagos, para guardar el registro del pago realizado
     @Autowired
     private PagoRepository pagoRepository;
+
+    // Envía el email de confirmación de cita al cliente cuando el pago se completa
+    @Autowired
+    private EmailService emailService;
+
+    // Crea el evento en el Google Calendar compartido cuando el pago se completa
+    @Autowired
+    private GoogleCalendarService googleCalendarService;
 
     // Clave secreta de la API de Stripe, leída de application.properties
     @Value("${stripe.api.key}")
@@ -105,6 +115,10 @@ public class PagoController {
 
             if (citaOpt.isPresent()) {
                 Cita cita = citaOpt.get();
+                // Si ya estaba PAGADO (p. ej. el cliente recarga esta misma página), no volvemos a
+                // mandar el email ni a crear otro evento de calendario duplicado.
+                boolean yaPagada = "PAGADO".equals(cita.getEstado());
+
                 cita.setEstado("PAGADO"); // Cambiamos estado
                 citaRepository.save(cita); // Guardamos en BD
 
@@ -116,6 +130,11 @@ public class PagoController {
                 pago.setFechaPago(LocalDateTime.now());
                 pago.setEstado("COMPLETADO");
                 pagoRepository.save(pago);
+
+                if (!yaPagada) {
+                    emailService.enviarConfirmacionCita(cita);
+                    googleCalendarService.crearEventoCita(cita);
+                }
 
                 System.out.println("EXITO: Cita " + id + " actualizada a PAGADO");
                 // Le paso el nombre del cliente a la vista para mostrar un mensaje personalizado
