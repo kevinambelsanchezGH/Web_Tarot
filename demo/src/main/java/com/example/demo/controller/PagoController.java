@@ -71,13 +71,13 @@ public class PagoController {
         SessionCreateParams params = SessionCreateParams.builder()
             .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
             .setMode(SessionCreateParams.Mode.PAYMENT)
-            .setSuccessUrl("http://localhost:8080/pago-exito?citaId=" + citaId)
-            .setCancelUrl("http://localhost:8080/pago-cancelado")
+            .setSuccessUrl("https://dualtarot.es/pago-exito?citaId=" + citaId)
+            .setCancelUrl("https://dualtarot.es/pago-cancelado")
             .addLineItem(SessionCreateParams.LineItem.builder()
                 .setQuantity(1L)
                 .setPriceData(SessionCreateParams.LineItem.PriceData.builder()
                     .setCurrency("eur")
-                    .setUnitAmount(7000L) // 70,00€
+                    .setUnitAmount(100L) // 1,00€
                     .setProductData(SessionCreateParams.LineItem.PriceData.ProductData.builder()
                         .setName("Reserva de Cita - Tarot")
                         .build())
@@ -125,7 +125,7 @@ public class PagoController {
                 // Creamos y guardamos el objeto Pago
                 Pago pago = new Pago();
                 pago.setCita(cita);
-                pago.setImporte(70.00); // El importe es 70.00€ según la configuración de Stripe (7000L cents)
+                pago.setImporte(1.00); // El importe es 70.00€ según la configuración de Stripe (7000L cents)
                 pago.setMetodoPago("Stripe Card"); // Se puede mejorar obteniendo el método de pago real de Stripe
                 pago.setFechaPago(LocalDateTime.now());
                 pago.setEstado("COMPLETADO");
