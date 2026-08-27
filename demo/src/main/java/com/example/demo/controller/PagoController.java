@@ -77,7 +77,7 @@ public class PagoController {
                 .setQuantity(1L)
                 .setPriceData(SessionCreateParams.LineItem.PriceData.builder()
                     .setCurrency("eur")
-                    .setUnitAmount(100L) // 1,00€
+                    .setUnitAmount(7500L) // 75,00€
                     .setProductData(SessionCreateParams.LineItem.PriceData.ProductData.builder()
                         .setName("Reserva de Cita - Tarot")
                         .build())
@@ -125,7 +125,7 @@ public class PagoController {
                 // Creamos y guardamos el objeto Pago
                 Pago pago = new Pago();
                 pago.setCita(cita);
-                pago.setImporte(1.00); // El importe es 70.00€ según la configuración de Stripe (7000L cents)
+                pago.setImporte(75.00); // El importe es 70.00€ según la configuración de Stripe (7000L cents)
                 pago.setMetodoPago("Stripe Card"); // Se puede mejorar obteniendo el método de pago real de Stripe
                 pago.setFechaPago(LocalDateTime.now());
                 pago.setEstado("COMPLETADO");
