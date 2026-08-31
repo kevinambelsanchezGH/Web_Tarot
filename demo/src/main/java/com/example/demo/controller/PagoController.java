@@ -71,7 +71,8 @@ public class PagoController {
         SessionCreateParams params = SessionCreateParams.builder()
             .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
             .setMode(SessionCreateParams.Mode.PAYMENT)
-            .setSuccessUrl("https://dualtarot.es/pago-exito?citaId=" + citaId)
+            .setClientReferenceId(citaId.toString())
+            .setSuccessUrl("https://dualtarot.es/pago-exito?citaId=" + citaId + "&session_id={CHECKOUT_SESSION_ID}")
             .setCancelUrl("https://dualtarot.es/pago-cancelado")
             .addLineItem(SessionCreateParams.LineItem.builder()
                 .setQuantity(1L)
@@ -99,12 +100,14 @@ public class PagoController {
 
     // Página a la que Stripe redirige tras un pago correcto: marca la cita como pagada y guarda el pago.
     @GetMapping("/pago-exito")
-    public String pagoExito(@RequestParam(required = false) String citaId, Model model) {
+    public String pagoExito(@RequestParam(required = false) String citaId,
+                             @RequestParam(required = false) String session_id,
+                             Model model) {
         System.out.println("!!! ATENCION: Stripe ha vuelto !!!");
         System.out.println("Valor de citaId que recibo de la URL: " + citaId);
 
-        // Si Stripe no manda citaId (o viene vacío), no hay nada que procesar: vuelvo al inicio
-        if (citaId == null || citaId.isEmpty()) {
+        // Si Stripe no manda citaId o session_id (o vienen vacíos), no hay nada que procesar: vuelvo al inicio
+        if (citaId == null || citaId.isEmpty() || session_id == null || session_id.isEmpty()) {
             return "redirect:/";
         }
 
@@ -115,6 +118,26 @@ public class PagoController {
 
             if (citaOpt.isPresent()) {
                 Cita cita = citaOpt.get();
+
+                // Verificamos contra la propia API de Stripe que esta sesión de pago concreta está
+                // realmente pagada y corresponde a esta cita, antes de tocar nada en la base de datos.
+                // Así no basta con conocer/adivinar un citaId para forzar el estado PAGADO: hace falta
+                // un session_id que Stripe confirme como pagado, y eso solo lo genera un pago real.
+                Stripe.apiKey = stripeApiKey;
+                Session stripeSession;
+                try {
+                    stripeSession = Session.retrieve(session_id);
+                } catch (StripeException e) {
+                    System.out.println("ERROR: session_id inválido al verificar el pago: " + e.getMessage());
+                    return "redirect:/";
+                }
+                boolean pagoValido = "paid".equals(stripeSession.getPaymentStatus())
+                        && citaId.equals(stripeSession.getClientReferenceId());
+                if (!pagoValido) {
+                    System.out.println("ERROR: Stripe no confirma el pago de la cita " + id + " para la sesión " + session_id);
+                    return "redirect:/";
+                }
+
                 // Si ya estaba PAGADO (p. ej. el cliente recarga esta misma página), no volvemos a
                 // mandar el email ni a crear otro evento de calendario duplicado.
                 boolean yaPagada = "PAGADO".equals(cita.getEstado());
