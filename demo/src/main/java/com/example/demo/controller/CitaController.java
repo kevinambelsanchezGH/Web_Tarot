@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -113,7 +112,12 @@ public String eliminarCita(@RequestParam("id") Long id) {
 @PostMapping("/guardar")
 @ResponseBody
 @Transactional // 1 sola transacción a la vez
-public ResponseEntity<?> guardarCita(@ModelAttribute Cita cita, @RequestParam Long disponibilidadId) {
+public ResponseEntity<?> guardarCita(@RequestParam(required = false) String nombre,
+                                      @RequestParam(required = false) String apellidos,
+                                      @RequestParam(required = false) String instagram,
+                                      @RequestParam(required = false) String telefono,
+                                      @RequestParam(required = false) String email,
+                                      @RequestParam Long disponibilidadId) {
     try {
         // 1. Busco el hueco con bloqueo pesimista. Bloquea la fila hasta que este método termine.
         Disponibilidad hueco = disponibilidadRepository.findByIdWithLock(disponibilidadId)
@@ -124,7 +128,14 @@ public ResponseEntity<?> guardarCita(@ModelAttribute Cita cita, @RequestParam Lo
             // Si ya estaba cogido, devuelvo un 409 (conflicto) y no creo la cita
             return ResponseEntity.status(409).body(Map.of("error", "El hueco ya ha sido reservado por otro usuario."));
         }
-        // 2. Configuro la cita con los datos del hueco
+        // 2. Construyo la cita yo mismo en el servidor, campo a campo: nunca confiamos en un "id"
+        // que pudiera venir del formulario, así nadie puede indicarnos qué fila sobrescribir.
+        Cita cita = new Cita();
+        cita.setNombre(nombre);
+        cita.setApellidos(apellidos);
+        cita.setInstagram(instagram);
+        cita.setTelefono(telefono);
+        cita.setEmail(email);
         cita.setFechaCita(hueco.getFechaHora());
         cita.setDisponibilidad(hueco);
         cita.setEstado("PENDIENTE");
