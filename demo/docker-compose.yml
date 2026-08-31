@@ -9,7 +9,7 @@ services:
       MYSQL_DATABASE: tarot_db
       MYSQL_ROOT_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
     ports:
-      - "3306:3306"
+      - "127.0.0.1:3306:3306"
     volumes:
       - db_data:/var/lib/mysql
 
