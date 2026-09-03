@@ -1,8 +1,10 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.Cita;
+import com.example.demo.model.Disponibilidad;
 import com.example.demo.model.Pago;
 import com.example.demo.repository.CitaRepository;
+import com.example.demo.repository.DisponibilidadRepository;
 import com.example.demo.repository.PagoRepository;
 import com.example.demo.service.EmailService;
 import com.example.demo.service.GoogleCalendarService;
@@ -20,6 +22,7 @@ import java.time.LocalDateTime;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,6 +39,11 @@ public class PagoController {
     // Acceso a la tabla de pagos, para guardar el registro del pago realizado
     @Autowired
     private PagoRepository pagoRepository;
+
+    // Acceso a la tabla de huecos, para volver a marcar el hueco como reservado
+    // si el pago llega tarde (después de que el job de limpieza lo liberase)
+    @Autowired
+    private DisponibilidadRepository disponibilidadRepository;
 
     // Envía el email de confirmación de cita al cliente cuando el pago se completa
     @Autowired
@@ -99,7 +107,10 @@ public class PagoController {
     }
 
     // Página a la que Stripe redirige tras un pago correcto: marca la cita como pagada y guarda el pago.
+    // @Transactional porque, si el hueco había sido liberado por LimpiezaReservasService, aquí lo
+    // volvemos a bloquear con findByIdWithLock (bloqueo pesimista, requiere una transacción activa).
     @GetMapping("/pago-exito")
+    @Transactional
     public String pagoExito(@RequestParam(required = false) String citaId,
                              @RequestParam(required = false) String session_id,
                              Model model) {
@@ -142,13 +153,24 @@ public class PagoController {
                 // mandar el email ni a crear otro evento de calendario duplicado.
                 boolean yaPagada = "PAGADO".equals(cita.getEstado());
 
+                // Pago tardío: si el job de limpieza ya había liberado este hueco (cita EXPIRADA)
+                // porque pasaron los 10 minutos, pero el pago se confirma de todas formas, lo
+                // reclamamos de vuelta (si nadie más lo ha cogido mientras tanto).
+                if (cita.getDisponibilidad() != null) {
+                    disponibilidadRepository.findByIdWithLock(cita.getDisponibilidad().getId())
+                            .ifPresent((Disponibilidad hueco) -> {
+                                hueco.setReservada(true);
+                                disponibilidadRepository.save(hueco);
+                            });
+                }
+
                 cita.setEstado("PAGADO"); // Cambiamos estado
                 citaRepository.save(cita); // Guardamos en BD
 
                 // Creamos y guardamos el objeto Pago
                 Pago pago = new Pago();
                 pago.setCita(cita);
-                pago.setImporte(75.00); // El importe es 70.00€ según la configuración de Stripe (7000L cents)
+                pago.setImporte(75.00); // El importe es 75.00€ según la configuración de Stripe (7500L cents)
                 pago.setMetodoPago("Stripe Card"); // Se puede mejorar obteniendo el método de pago real de Stripe
                 pago.setFechaPago(LocalDateTime.now());
                 pago.setEstado("COMPLETADO");

@@ -22,7 +22,9 @@ public class Cita {
 
     // Fecha y hora reales de la cita (copiadas del hueco al crearla)
     private LocalDateTime fechaCita;
-    // Estado de la cita: PENDIENTE, PAGADO, etc.
+    // Momento en el que se creó la reserva (para poder expirarla si tarda en pagarse)
+    private LocalDateTime fechaCreacion;
+    // Estado de la cita: PENDIENTE, PAGADO, EXPIRADA, etc.
     private String estado;
     // Datos de contacto del cliente, rellenados desde el formulario de reserva
     private String nombre;
@@ -44,6 +46,9 @@ public class Cita {
 
     public LocalDateTime getFechaCita() {return fechaCita;}
     public void setFechaCita(LocalDateTime fechaCita) {this.fechaCita = fechaCita;}
+
+    public LocalDateTime getFechaCreacion() {return fechaCreacion;}
+    public void setFechaCreacion(LocalDateTime fechaCreacion) {this.fechaCreacion = fechaCreacion;}
 
     public String getEstado() {return estado;}
     public void setEstado(String estado) {this.estado = estado;}

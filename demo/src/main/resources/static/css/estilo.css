@@ -433,6 +433,18 @@ body.panel-admin {
     color: #f1c40f;
 }
 
+.badge-expired {
+    background: rgba(149, 165, 166, 0.2);
+    color: #95a5a6;
+}
+
+.aviso-tiempo {
+    font-size: 0.85rem;
+    opacity: 0.75;
+    text-align: center;
+    margin-top: 8px;
+}
+
 .success-icon {
     text-align: center;
     font-size: 3rem;

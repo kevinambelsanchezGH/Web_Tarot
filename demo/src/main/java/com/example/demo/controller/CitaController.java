@@ -139,6 +139,7 @@ public ResponseEntity<?> guardarCita(@RequestParam(required = false) String nomb
         cita.setFechaCita(hueco.getFechaHora());
         cita.setDisponibilidad(hueco);
         cita.setEstado("PENDIENTE");
+        cita.setFechaCreacion(LocalDateTime.now());
 
         // 3. Guardo la cita y capturo el objeto con su ID real
         Cita citaGuardada = citaRepository.save(cita);

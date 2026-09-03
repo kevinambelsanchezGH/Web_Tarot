@@ -63,7 +63,7 @@
                             <td th:text="${cita.id}"></td>
                             <td th:text="${cita.fechaCita != null ? #temporals.format(cita.fechaCita, 'dd/MM/yyyy HH:mm') : 'Sin fecha'}"></td>
                             <td>
-                                <span class="badge" th:classappend="${cita.estado == 'PAGADO'} ? 'badge-success' : 'badge-pending'" th:text="${cita.estado}"></span>
+                                <span class="badge" th:classappend="${cita.estado == 'PAGADO'} ? 'badge-success' : (${cita.estado == 'EXPIRADA'} ? 'badge-expired' : 'badge-pending')" th:text="${cita.estado}"></span>
                             </td>
                             <td th:text="${cita.nombre ?: 'N/A'}"></td>
                             <td th:text="${cita.apellidos ?: 'N/A'}"></td>
