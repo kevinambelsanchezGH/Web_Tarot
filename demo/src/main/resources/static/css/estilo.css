@@ -445,6 +445,26 @@ body.panel-admin {
     margin-top: 8px;
 }
 
+.sin-huecos {
+    text-align: center;
+    padding: 30px 20px;
+    border: 1px dashed rgba(255, 255, 255, 0.25);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.sin-huecos p {
+    color: rgba(255, 255, 255, 0.7);
+    margin: 8px 0;
+}
+
+.sin-huecos-titulo {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 14px;
+}
+
 .success-icon {
     text-align: center;
     font-size: 3rem;

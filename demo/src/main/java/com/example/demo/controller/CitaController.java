@@ -119,6 +119,13 @@ public ResponseEntity<?> guardarCita(@RequestParam(required = false) String nomb
                                       @RequestParam(required = false) String email,
                                       @RequestParam Long disponibilidadId) {
     try {
+        // El email es obligatorio: es por donde se manda la confirmación de la cita.
+        // El formulario ya lo exige, pero lo comprobamos aquí también por si alguien
+        // enviara la petición sin pasar por la web.
+        if (email == null || email.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "El email es obligatorio para poder enviarte la confirmación."));
+        }
+
         // 1. Busco el hueco con bloqueo pesimista. Bloquea la fila hasta que este método termine.
         Disponibilidad hueco = disponibilidadRepository.findByIdWithLock(disponibilidadId)
             .orElseThrow(() -> new RuntimeException("Hueco no encontrado"));

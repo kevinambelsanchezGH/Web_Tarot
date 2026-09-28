@@ -32,15 +32,22 @@
   <div class="card reveal reveal-delay">
     <h2>🔮 Sesiones privadas Dualtarot</h2>
     <p class="subtitle">Reserva tu cita y descubre lo que las cartas tienen para ti</p>
-    <form id="formReserva">
+    <!-- Si no queda ningún hueco libre, se muestra el aviso en lugar del formulario -->
+    <div th:if="${#lists.isEmpty(huecosDisponibles)}" class="sin-huecos">
+        <p class="sin-huecos-titulo">🌙 Citas agotadas</p>
+        <p>Ahora mismo no queda ninguna sesión disponible.</p>
+        <p>Cada <strong>día 1 de mes</strong> se abren las citas del mes siguiente. ¡Te espero!</p>
+    </div>
+
+    <form id="formReserva" th:unless="${#lists.isEmpty(huecosDisponibles)}">
         <div class="form-row">
             <input type="text" name="nombre" id="nombre" placeholder="Nombre" required>
             <input type="text" name="apellidos" id="apellidos" placeholder="Apellidos">
         </div>
         <input type="text" name="instagram" id="instagram" placeholder="Usuario de Instagram" required>
         <input type="text" name="telefono" id="telefono" placeholder="Teléfono móvil (Opcional)">
-        <input type="email" name="email" id="email" placeholder="Email (Opcional)">
-        
+        <input type="email" name="email" id="email" placeholder="Email" required>
+
         <label for="citaSelect">Selecciona tu cita:</label>
         <select name="disponibilidadId" id="citaSelect" required>
             <option value="" disabled selected>-- Elige un día y hora --</option>
