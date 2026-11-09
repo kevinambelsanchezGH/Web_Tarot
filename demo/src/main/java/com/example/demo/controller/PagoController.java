@@ -53,6 +53,10 @@ public class PagoController {
     @Autowired
     private GoogleCalendarService googleCalendarService;
 
+    // Estado de una cita que se pagó tarde cuando su hueco ya lo tenía otra persona (o se borró).
+    // El cliente ha pagado pero no tiene hora: hay que devolverle el dinero o darle otra hora.
+    public static final String ESTADO_SIN_HUECO = "PAGADO_SIN_HUECO";
+
     // Clave secreta de la API de Stripe, leída de application.properties
     @Value("${stripe.api.key}")
     private String stripeApiKey;
@@ -80,6 +84,11 @@ public class PagoController {
             .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
             .setMode(SessionCreateParams.Mode.PAYMENT)
             .setClientReferenceId(citaId.toString())
+            // Por defecto Stripe deja la página de pago abierta 24 h. La cerramos lo antes que
+            // permite Stripe (mínimo 30 min; ponemos 31 para no rozar el límite por desfase de
+            // reloj). La reserva en la web sigue caducando a los 10 min; un pago que entre entre
+            // el minuto 10 y el 31 se trata como "pago tardío" en pagoExito.
+            .setExpiresAt(java.time.Instant.now().plusSeconds(31 * 60).getEpochSecond())
             .setSuccessUrl("https://dualtarot.es/pago-exito?citaId=" + citaId + "&session_id={CHECKOUT_SESSION_ID}")
             .setCancelUrl("https://dualtarot.es/pago-cancelado")
             .addLineItem(SessionCreateParams.LineItem.builder()
@@ -149,25 +158,38 @@ public class PagoController {
                     return "redirect:/";
                 }
 
-                // Si ya estaba PAGADO (p. ej. el cliente recarga esta misma página), no volvemos a
-                // mandar el email ni a crear otro evento de calendario duplicado.
-                boolean yaPagada = "PAGADO".equals(cita.getEstado());
+                model.addAttribute("nombre", cita.getNombre());
 
-                // Pago tardío: si el job de limpieza ya había liberado este hueco (cita EXPIRADA)
-                // porque pasaron los 10 minutos, pero el pago se confirma de todas formas, lo
-                // reclamamos de vuelta (si nadie más lo ha cogido mientras tanto).
-                if (cita.getDisponibilidad() != null) {
-                    disponibilidadRepository.findByIdWithLock(cita.getDisponibilidad().getId())
-                            .ifPresent((Disponibilidad hueco) -> {
-                                hueco.setReservada(true);
-                                disponibilidadRepository.save(hueco);
-                            });
+                // Si ya se procesó este pago (p. ej. el cliente recarga esta misma página), no
+                // repetimos nada: ni otro registro de Pago, ni email, ni evento de calendario.
+                if ("PAGADO".equals(cita.getEstado())) {
+                    return "pago_exito";
+                }
+                if (ESTADO_SIN_HUECO.equals(cita.getEstado())) {
+                    model.addAttribute("sinHueco", true);
+                    return "pago_exito";
                 }
 
-                cita.setEstado("PAGADO"); // Cambiamos estado
-                citaRepository.save(cita); // Guardamos en BD
+                // Pago tardío: la cita ya había caducado (EXPIRADA) y su hueco se liberó.
+                // Solo se lo devolvemos si sigue existiendo y nadie más lo ha reservado.
+                boolean sinHueco = false;
+                if ("EXPIRADA".equals(cita.getEstado())) {
+                    Disponibilidad hueco = cita.getDisponibilidad() == null ? null
+                            : disponibilidadRepository.findByIdWithLock(cita.getDisponibilidad().getId()).orElse(null);
+                    if (hueco == null || hueco.isReservada()) {
+                        // Otra persona lo cogió (o el admin borró el hueco): el cliente ha pagado
+                        // pero no tiene hora. Se marca para gestionarlo a mano desde el panel.
+                        sinHueco = true;
+                    } else {
+                        hueco.setReservada(true);
+                        disponibilidadRepository.save(hueco);
+                    }
+                }
 
-                // Creamos y guardamos el objeto Pago
+                cita.setEstado(sinHueco ? ESTADO_SIN_HUECO : "PAGADO");
+                citaRepository.save(cita);
+
+                // Creamos y guardamos el objeto Pago (también en el caso sin hueco: el dinero se cobró)
                 Pago pago = new Pago();
                 pago.setCita(cita);
                 pago.setImporte(75.00); // El importe es 75.00€ según la configuración de Stripe (7500L cents)
@@ -176,14 +198,17 @@ public class PagoController {
                 pago.setEstado("COMPLETADO");
                 pagoRepository.save(pago);
 
-                if (!yaPagada) {
-                    emailService.enviarConfirmacionCita(cita);
-                    googleCalendarService.crearEventoCita(cita);
+                if (sinHueco) {
+                    // No mandamos confirmación ni creamos evento: esa hora no es suya.
+                    System.out.println("AVISO: Cita " + id + " pagada tarde y su hueco ya no está disponible -> " + ESTADO_SIN_HUECO);
+                    model.addAttribute("sinHueco", true);
+                    return "pago_exito";
                 }
 
+                emailService.enviarConfirmacionCita(cita);
+                googleCalendarService.crearEventoCita(cita);
+
                 System.out.println("EXITO: Cita " + id + " actualizada a PAGADO");
-                // Le paso el nombre del cliente a la vista para mostrar un mensaje personalizado
-                model.addAttribute("nombre", cita.getNombre());
                 return "pago_exito"; // Carga pago_exito.html
             } else {
                 // Si el id no corresponde a ninguna cita, no hay nada que mostrar: vuelvo al inicio

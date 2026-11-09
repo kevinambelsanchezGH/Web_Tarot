@@ -8,9 +8,16 @@
 </head>
 <body>
     <div class="card">
-        <div class="success-icon">✅</div>
-        <h2>¡Pago completado!</h2>
-        <p class="subtitle">Gracias <strong th:text="${nombre}">Usuario</strong>, tu cita ya está confirmada.</p>
+        <th:block th:if="${sinHueco}">
+            <div class="success-icon">⚠️</div>
+            <h2>Pago recibido</h2>
+            <p class="subtitle">Gracias <strong th:text="${nombre}">Usuario</strong>. Hemos recibido tu pago, pero el tiempo de reserva había caducado y ese hueco ya lo ha cogido otra persona. Nos pondremos en contacto contigo por email para darte otra hora o devolverte el dinero.</p>
+        </th:block>
+        <th:block th:unless="${sinHueco}">
+            <div class="success-icon">✅</div>
+            <h2>¡Pago completado!</h2>
+            <p class="subtitle">Gracias <strong th:text="${nombre}">Usuario</strong>, tu cita ya está confirmada.</p>
+        </th:block>
         <a href="/" class="btn-link">Volver a la web</a>
     </div>
 </body>

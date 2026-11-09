@@ -53,10 +53,22 @@ public String mostrarPanel(Model model) {
 }
 
 // Borra un hueco de disponibilidad a partir de su id (botón "eliminar" del admin).
+@Transactional
 @PostMapping("/admin/eliminar-hueco")
 public String eliminarHueco(@RequestParam("id") Long id) {
-    // Borramos el hueco de la base de datos usando su ID
-    disponibilidadRepository.deleteById(id);
+    // Bloqueamos el hueco para que nadie lo reserve mientras lo borramos.
+    // Si no existe o está reservado (cita activa), no lo tocamos.
+    Disponibilidad hueco = disponibilidadRepository.findByIdWithLock(id).orElse(null);
+    if (hueco == null || hueco.isReservada()) {
+        return "redirect:/admin";
+    }
+
+    // Las citas EXPIRADAS siguen apuntando al hueco que se liberó; si no las
+    // desvinculamos, la clave foránea impide el borrado (error 500).
+    citaRepository.desvincularHueco(id);
+
+    // Borramos el hueco de la base de datos
+    disponibilidadRepository.delete(hueco);
 
     // Volvemos al panel para que el hueco ya no aparezca
     return "redirect:/admin";

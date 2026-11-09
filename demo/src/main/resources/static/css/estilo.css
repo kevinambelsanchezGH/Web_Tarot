@@ -438,6 +438,12 @@ body.panel-admin {
     color: #95a5a6;
 }
 
+/* Pagada tarde sin hueco: requiere acción del admin (devolver dinero o dar otra hora) */
+.badge-conflict {
+    background: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+}
+
 .aviso-tiempo {
     font-size: 0.85rem;
     opacity: 0.75;
